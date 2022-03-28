@@ -1,12 +1,9 @@
 package com.xyzcorp.testproject.domain;
 
-import lombok.Builder;
-import lombok.Data;
+import com.xyzcorp.testproject.persistence.User;
 import lombok.Getter;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @Getter

@@ -1,4 +1,4 @@
-package com.xyzcorp.testproject.domain;
+package com.xyzcorp.testproject.persistence;
 
 import lombok.Builder;
 import lombok.Data;
