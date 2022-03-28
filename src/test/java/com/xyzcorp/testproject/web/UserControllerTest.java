@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
-@SpringBootTest
+@SpringBootTest()
 class UserControllerTest {
 
     @Autowired
@@ -29,6 +29,8 @@ class UserControllerTest {
     private StringBuilder badData;
 
     private StringBuilder lessThanZeroData;
+
+    private StringBuilder getUserData;
 
     @BeforeEach
     public void init() throws JsonProcessingException {
@@ -49,6 +51,14 @@ class UserControllerTest {
         lessThanZeroData.append("NAME,SALARY")
                 .append("\n")
                 .append("Zac,-10")
+                .append("\n")
+                .append("Joe,2500.1");
+        getUserData = new StringBuilder();
+        getUserData.append("NAME,SALARY")
+                .append("\n")
+                .append("John,100.21")
+                .append("\n")
+                .append("Sam,1200.1")
                 .append("\n")
                 .append("Joe,2500.1");
 
@@ -85,19 +95,13 @@ class UserControllerTest {
                         ",{\"name\":\"Sam\",\"salary\":1200.1}" +
                         ",{\"name\":\"Joe\",\"salary\":2500.1}]}")));
     }
+
+
+
+
     @Test
-    public void whenLimitIsOneAndOffset_thenOnePerPage() throws Exception {
-        this.mvcMock.perform(get("/users?limit=1&offset=0"))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(content().string(containsString("{\"results\":[{\"name\":\"John\",\"salary\":100.21}]}")));
-
-        this.mvcMock.perform(get("/users?limit=1&offset=1"))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(content().string(containsString("{\"results\":[{\"name\":\"Sam\",\"salary\":1200.1}]}")));
-    }
-
-    //@Test
     public void whenSort_thenSorted() throws Exception {
+        uploadFileForGet();
         this.mvcMock.perform(get("/users?sort=name"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().string(containsString("{\"results\":[{\"name\":\"Joe\",\"salary\":2500.1}," +
@@ -111,11 +115,31 @@ class UserControllerTest {
 
     @Test
     public void whenMinAndMax_thenBetweenRecords() throws Exception {
+        uploadFileForGet();
         this.mvcMock.perform(get("/users?min=100&max=2000"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().string(containsString("{\"results\":[{\"name\":\"John\",\"salary\":100.21}" +
                         ",{\"name\":\"Sam\",\"salary\":1200.1}]}")));
 
         }
+
+    @Test
+    public void whenLimitIsOneAndOffset_thenOnePerPage() throws Exception {
+        uploadFileForGet();
+        this.mvcMock.perform(get("/users?limit=1&offset=0"))
+              .andExpect(status().is2xxSuccessful())
+                .andExpect(content().string(containsString("{\"results\":[{\"name\":\"John\",\"salary\":100.21}]}")));
+
+        this.mvcMock.perform(get("/users?limit=1&offset=1"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().string(containsString("{\"results\":[{\"name\":\"Sam\",\"salary\":1200.1}]}")));
+    }
+    private void uploadFileForGet() throws Exception {
+        MockMultipartFile multipartFile = new MockMultipartFile("file", "test1.csv",
+                "text/plain", getUserData.toString().getBytes());
+        this.mvcMock.perform(multipart("/users/upload").file(multipartFile))
+                .andExpect(status().is2xxSuccessful());
+
+    }
 }
 
