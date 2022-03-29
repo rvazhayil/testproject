@@ -4,6 +4,7 @@ import com.xyzcorp.testproject.domain.UserDto;
 import com.xyzcorp.testproject.persistence.User;
 import com.xyzcorp.testproject.persistence.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
@@ -24,6 +26,7 @@ public class UserServiceImpl implements UserService {
 
 
         Page<User> page = userRepository.findBySalaryBetween(min,max,pageable);
+        log.debug("Result {} ",page);
         if(page.hasContent()){
             return page.getContent();
         }else{
